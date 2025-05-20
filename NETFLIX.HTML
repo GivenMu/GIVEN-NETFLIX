@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>My Netflix Clone</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+<style>
+* {
+margin: 0;
+padding: 0;
+box-sizing: border-box;
+}
+
+body {
+background-color: #141414;
+color: white;
+font-family: Arial, sans-serif;
+}
+
+.header {
+padding: 20px 40px;
+position: fixed;
+top: 0;
+width: 100%;
+z-index: 100;
+background: linear-gradient(to bottom, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0) 100%);
+display: flex;
+justify-content: space-between;
+align-items: center;
+}
+
+.netflix-logo {
+color: #e50914;
+font-size: 32px;
+font-weight: bold;
+}
+
+.logout-btn {
+background: #e50914;
+color: white;
+border: none;
+padding: 8px 16px;
+border-radius: 4px;
+cursor: pointer;
+}
+
+.login-container {
+height: 100vh;
+display: flex;
+align-items: center;
+justify-content: center;
+background-image: url('https://assets.nflxext.com/ffe/siteui/vlv3/9c5457b8-9ab0-4a04-9fc1-e608d5670f1a/710d74e0-7158-408e-8d9b-23c219dee5df/IN-en-20210719-popsignuptwoweeks-perspective_alpha_website_small.jpg');
+background-size: cover;
+background-position: center;
+}
+
+.login-form {
+background: rgba(0, 0, 0, 0.85);
+padding: 60px;
+border-radius: 4px;
+width: 450px;
+}
+
+.login-form h2 {
+margin-bottom: 28px;
+color: white;
+font-size: 32px;
+}
+
+.form-control {
+margin-bottom: 16px;
+}
+
+.form-control input {
+width: 100%;
+height: 50px;
+border: none;
+border-radius: 4px;
+padding: 16px;
+background-color: #333;
+color: white;
+font-size: 16px;
+}
+
+.error-message {
+color: #e50914;
+margin-top: 10px;
+display: none;
+font-size: 14px;
+}
+
+.signin-btn {
+width: 100%;
+height: 50px;
+background-color: #e50914;
+color: white;
+border: none;
+border-radius: 4px;
+font-size: 16px;
+font-weight: bold;
+cursor: pointer;
+margin-top: 24px;
+transition: background-color 0.3s;
+}
+
+.signin-btn:hover {
+background-color: #f40612;
+}
+
+.home-container {
+display: none;
+padding: 70px 40px;
+}
+
+.categories {
+margin-bottom: 40px;
+margin-top: 60px;
+}
+
+.category-title {
+font-size: 24px;
+margin-bottom: 20px;
+}
+
+.movies-row {
+display: grid;
+grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+gap: 20px;
+padding: 20px 0;
+}
+
+.movie-card {
+position: relative;
+transition: transform 0.3s;
+cursor: pointer;
+}
+
+.movie-card:hover {
+transform: scale(1.05);
+}
+
+.movie-card img {
+width: 100%;
+height: 300px;
+object-fit: cover;
+border-radius: 4px;
+}
+
+.movie-info {
+position: absolute;
+bottom: 0;
+left: 0;
+right: 0;
+padding: 15px;
+background: linear-gradient(to top, rgba(0,0,0,0.9), rgba(0,0,0,0));
+border-radius: 0 0 4px 4px;
+}
+
+.movie-title {
+font-size: 16px;
+margin-bottom: 5px;
+}
+
+.video-player {
+display: none;
+position: fixed;
+top: 0;
+left: 0;
+width: 100%;
+height: 100%;
+background-color: rgba(0,0,0,0.95);
+z-index: 1000;
+}
+
+.video-container {
+position: relative;
+width: 85%;
+height: 85%;
+margin: 3% auto;
+}
+
+.close-btn {
+position: absolute;
+top: -40px;
+right: 0;
+color: white;
+font-size: 35px;
+cursor: pointer;
+transition: color 0.3s;
+}
+
+.close-btn:hover {
+color: #e50914;
+}
+
+video {
+width: 100%;
+height: 100%;
+border-radius: 8px;
+}
+
+@media (max-width: 768px) {
+.login-form {
+width: 90%;
+padding: 30px;
+}
+
+.movies-row {
+    display: flex;
+    overflow-x: auto;
+    padding: 20px 0;
+    gap: 15px;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    scroll-behavior: smooth;
+}
+
+.movies-row::-webkit-scrollbar {
+    display: none;
+}
+
+.movie-card {
+    flex: 0 0 auto;
+    width: 250px;
+    position: relative;
+    transition: transform 0.3s ease;
+}
+
+.movie-card:hover {
+    transform: scale(1.05);
+    z-index: 2;
+}
+
+.categories {
+    margin-bottom: 50px;
+    padding: 0 40px;
+}
+
+.category-title {
+    font-size: 24px;
+    margin-bottom: 20px;
+    padding-left: 10px;
+}
+
+</style>
+</head>
+<body>
+<div class="login-container" id="loginSection">
+<div class="login-form">
+<h2>Sign In</h2>
+<div class="form-control">
+<input type="email" id="emailInput" placeholder="Email or phone number" required>
+</div>
+<div class="form-control">
+<input type="password" id="passwordInput" placeholder="Password" required>
+</div>
+<div class="error-message" id="errorMessage">
+Invalid email or password. Please try again.
+</div>
+<button class="signin-btn" onclick="login()">Sign In</button>
+</div>
+</div>
+<div class="home-container" id="homeSection">
+    <div class="header">
+        <div class="netflix-logo">NETFLIX</div>
+        <button class="logout-btn" onclick="logout()">Logout</button>
+    </div>
+
+    <!-- Trending Now Section -->
+<div class="categories">
+    <h2 class="category-title">Trending Now</h2>
+    <div class="movies-row">
+        <div class="movie-card" onclick="playVideo('sample-video-url.mp4')">
+            <img src="https://m.media-amazon.com/images/M/MV5BMDBmYTZjNjUtN2M1MS00MTQ2LTk2ODgtNzc2M2QyZGE5NTVjXkEyXkFqcGdeQXVyNzAwMjU2MTY@._V1_.jpg" alt="Oppenheimer">
+            <div class="movie-info">
+                <h3 class="movie-title">Oppenheimer</h3>
+            </div>
+        </div>
+        <div class="movie-card" onclick="playVideo('sample-video-url.mp4')">
+            <img src="https://m.media-amazon.com/images/M/MV5BNjU3N2QxNzYtMjk1NC00MTc4LTk1NTQtMmUxNTljM2I0NDA5XkEyXkFqcGdeQXVyODE5NzE3OTE@._V1_.jpg" alt="Barbie">
+            <div class="movie-info">
+                <h3 class="movie-title">Barbie</h3>
+            </div>
+        </div>
+        <div class="movie-card" onclick="playVideo('sample-video-url.mp4')">
+            <img src="https://m.media-amazon.com/images/M/MV5BNzZmOTU1ZTEtYzVhNi00NzQxLWI5ZjAtNWNhNjEwY2E3YmZjXkEyXkFqcGdeQXVyODk4OTc3MTY@._V1_.jpg" alt="Fast X">
+            <div class="movie-info">
+                <h3 class="movie-title">Fast X</h3>
+            </div>
+        </div>
+        <div class="movie-card" onclick="playVideo('sample-video-url.mp4')">
+            <img src="https://m.media-amazon.com/images/M/MV5BYTUxYjczMWUtYzlkZC00NTcwLWE3ODQtN2I2YTIxOTU0ZTljXkEyXkFqcGdeQXVyMTkxNjUyNQ@@._V1_.jpg" alt="The Flash">
+            <div class="movie-info">
+                <h3 class="movie-title">The Little Mermaid</h3>
+            </div>
+        </div>
+        <div class="movie-card" onclick="playVideo('sample-video-url.mp4')">
+    <img src="https://m.media-amazon.com/images/M/MV5BMTQ1OTU0ODcxMV5BMl5BanBnXkFtZTcwOTMxNTUwOA@@._V1_.jpg" alt="Ted">
+    <div class="movie-info">
+        <h3 class="movie-title">Ted</h3>
+    </div>
+</div>
+        <div class="movie-card" onclick="playVideo('sample-video-url.mp4')">
+            <img src="https://m.media-amazon.com/images/M/MV5BZTNiNDA4NmMtNTExNi00YmViLWJkMDAtMDAxNmRjY2I2NDVjXkEyXkFqcGdeQXVyMDM2NDM2MQ@@._V1_.jpg" alt="Transformers: Rise of the Beasts">
+            <div class="movie-info">
+                <h3 class="movie-title">Transformers: Rise of the Beasts</h3>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Action Movies Section -->
+<div class="categories">
+    <h2 class="category-title">Action Movies</h2>
+    <div class="movies-row">
+        <div class="movie-card" onclick="playVideo('sample-video-url.mp4')">
+            <img src="https://m.media-amazon.com/images/M/MV5BMTU2NjA1ODgzMF5BMl5BanBnXkFtZTgwMTM2MTI4MjE@._V1_.jpg" alt="John Wick">
+            <div class="movie-info">
+                <h3 class="movie-title">John Wick</h3>
+            </div>
+        </div>
+        <div class="movie-card" onclick="playVideo('sample-video-url.mp4')">
+            <img src="https://m.media-amazon.com/images/M/MV5BMTk5ODk1NDkxMF5BMl5BanBnXkFtZTcwNTA5OTY0OQ@@._V1_.jpg" alt="Man of Steel">
+            <div class="movie-info">
+                <h3 class="movie-title">Man of Steel</h3>
+            </div>
+        </div>
+        <div class="movie-card" onclick="playVideo('sample-video-url.mp4')">
+            <img src="https://m.media-amazon.com/images/M/MV5BMTMxNTMwODM0NF5BMl5BanBnXkFtZTcwODAyMTk2Mw@@._V1_.jpg" alt="The Dark Knight">
+            <div class="movie-info">
+                <h3 class="movie-title">The Dark Knight</h3>
+            </div>
+        </div>
+        <div class="movie-card" onclick="playVideo('sample-video-url.mp4')">
+            <img src="https://m.media-amazon.com/images/M/MV5BOGE4NzU1YTAtNzA3Mi00ZTA2LTg2YmYtMDJmMThiMjlkYjg2XkEyXkFqcGdeQXVyNTgzMDMzMTg@._V1_.jpg" alt="Thor">
+            <div class="movie-info">
+                <h3 class="movie-title">Thor</h3>
+            </div>
+        </div>
+        <div class="movie-card" onclick="playVideo('sample-video-url.mp4')">
+            <img src="https://m.media-amazon.com/images/M/MV5BMjQ0MTgyNjAxMV5BMl5BanBnXkFtZTgwNjUzMDkyODE@._V1_.jpg" alt="Captain America: Civil War">
+            <div class="movie-info">
+                <h3 class="movie-title">Captain America: Civil War</h3>
+            </div>
+        </div>
+        <div class="movie-card" onclick="playVideo('sample-video-url.mp4')">
+            <img src="https://m.media-amazon.com/images/M/MV5BMjAxMzY3NjcxNF5BMl5BanBnXkFtZTcwNTI5OTM0Mw@@._V1_.jpg" alt="Inception">
+            <div class="movie-info">
+                <h3 class="movie-title">Inception</h3>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Horror Movies Section -->
+<div class="categories">
+    <h2 class="category-title">Horror Movies</h2>
+    <div class="movies-row">
+        <div class="movie-card" onclick="playVideo('sample-video-url.mp4')">
+            <img src="https://m.media-amazon.com/images/M/MV5BZDVkZmI0YzAtNzdjYi00ZjhhLWE1ODEtMWMzMWMzNDA0NmQ4XkEyXkFqcGdeQXVyNzYzODM3Mzg@._V1_.jpg" alt="IT">
+            <div class="movie-info">
+                <h3 class="movie-title">IT</h3>
+            </div>
+        </div>
+        <div class="movie-card" onclick="playVideo('sample-video-url.mp4')">
+            <img src="https://m.media-amazon.com/images/M/MV5BZjU5OWVlN2EtODNlYy00MjhhLWI0MDUtMTA3MmQ5MGMwYTZmXkEyXkFqcGdeQXVyNjE5MTM4MzY@._V1_.jpg" alt="A Quiet Place">
+            <div class="movie-info">
+                <h3 class="movie-title">Conjuring 2</h3>
+            </div>
+        </div>
+        <div class="movie-card" onclick="playVideo('sample-video-url.mp4')">
+            <img src="https://m.media-amazon.com/images/M/MV5BOTQwZmQyYzEtODk5ZC00OTY3LWExMjAtYzRjNWFhNGM3MzBlXkEyXkFqcGdeQXVyNTIzOTk5ODM@._V1_.jpg" alt="Annabelle">
+            <div class="movie-info">
+                <h3 class="movie-title">Annabelle</h3>
+            </div>
+        </div>
+       <div class="movie-card" onclick="playVideo('videos/midsommar.MKV')">
+    <img src="https://m.media-amazon.com/images/M/MV5BMzQxNzQzOTQwM15BMl5BanBnXkFtZTgwMDQ2NTcwODM@._V1_.jpg" alt="Midsommar">
+    <div class="movie-info">
+        <h3 class="movie-title">Midsommar</h3>
+    </div>
+</div>
+
+        <div class="movie-card" onclick="playVideo('sample-video-url.mp4')">
+            <img src="https://m.media-amazon.com/images/M/MV5BMTg5NzY0MzA2MV5BMl5BanBnXkFtZTYwNDc3NTc2._V1_.jpg" alt="Signs">
+            <div class="movie-info">
+                <h3 class="movie-title">Cars</h3>
+            </div>
+        </div>
+        <div class="movie-card" onclick="playVideo('sample-video-url.mp4')">
+            <img src="https://m.media-amazon.com/images/M/MV5BMjUxMDQwNjcyNl5BMl5BanBnXkFtZTgwNzcwMzc0MTI@._V1_.jpg" alt="Get Out">
+            <div class="movie-info">
+                <h3 class="movie-title">Get Out</h3>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Comedy Movies Section -->
+<div class="categories">
+    <h2 class="category-title">Comedy Movies</h2>
+    <div class="movies-row">
+        <div class="movie-card" onclick="playVideo('sample-video-url.mp4')">
+            <img src="https://m.media-amazon.com/images/M/MV5BMjM1MzczMDgwOV5BMl5BanBnXkFtZTcwMDM4NjM2OQ@@._V1_.jpg" alt="The Hangover">
+            <div class="movie-info">
+                <h3 class="movie-title">The Hangover</h3>
+            </div>
+        </div>
+        <div class="movie-card" onclick="playVideo('sample-video-url.mp4')">
+            <img src="https://m.media-amazon.com/images/M/MV5BNjI5OTQ0MDQxM15BMl5BanBnXkFtZTgwMzcwNjMyNTE@._V1_.jpg" alt="Deadpool">
+            <div class="movie-info">
+                <h3 class="movie-title">Spy</h3>
+            </div>
+        </div>
+        <div class="movie-card" onclick="playVideo('sample-video-url.mp4')">
+            <img src="https://m.media-amazon.com/images/M/MV5BMjM3MjQ1MzkxNl5BMl5BanBnXkFtZTgwODk1ODgyMjI@._V1_.jpg" alt="Thor: Ragnarok">
+            <div class="movie-info">
+                <h3 class="movie-title">Baby Driver</h3>
+            </div>
+        </div>
+        <div class="movie-card" onclick="playVideo('sample-video-url.mp4')">
+            <img src="https://m.media-amazon.com/images/M/MV5BMjI4MzU5NTExNF5BMl5BanBnXkFtZTgwNzY1MTEwMDI@._V1_.jpg" alt="Ghostbusters">
+            <div class="movie-info">
+                <h3 class="movie-title">Moana</h3>
+            </div>
+        </div>
+        <div class="movie-card" onclick="playVideo('sample-video-url.mp4')">
+            <img src="https://m.media-amazon.com/images/M/MV5BMTQ1OTU0ODcxMV5BMl5BanBnXkFtZTcwOTMxNTUwOA@@._V1_.jpg" alt="Ted">
+            <div class="movie-info">
+                <h3 class="movie-title">Ted</h3>
+            </div>
+        </div>
+        <div class="movie-card" onclick="playVideo('sample-video-url.mp4')">
+            <img src="https://m.media-amazon.com/images/M/MV5BNjgwNzAzNjk1Nl5BMl5BanBnXkFtZTgwMzQ2NjI1OTE@._V1_.jpg" alt="Doctor Strange">
+            <div class="movie-info">
+                <h3 class="movie-title">Doctor Strange</h3>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+<div class="home-container" id="homeSection">
+<div class="header">
+<div class="netflix-logo">NETFLIX</div>
+<button class="logout-btn" onclick="logout()">Logout</button>
+</div>
+
+<div class="categories">
+<h2 class="category-title">Trending Now</h2>
+<div class="movies-row">
+<!-- Add your movie cards here with actual images and video sources -->
+</div>
+</div>
+</div>
+
+<div class="video-player" id="videoPlayer">
+    <div class="video-container">
+        <span class="close-btn" onclick="closeVideo()">&times;</span>
+        <video id="videoElement" controls>
+            <source src="" type="video/mp4">
+            Your browser does not support the video tag.
+        </video>
+        <div class="video-controls">
+            <button class="play-pause">Play/Pause</button>
+            <input type="range" class="seek-bar" value="0">
+            <button class="full-screen">Fullscreen</button>
+        </div>
+    </div>
+</div>
+
+<script>
+function login() {
+const email = document.getElementById('emailInput').value;
+const password = document.getElementById('passwordInput').value;
+const errorMessage = document.getElementById('errorMessage');
+
+if (email === 'mutshotsho@gmail.com' && password === '123456789') {
+document.getElementById('loginSection').style.display = 'none';
+document.getElementById('homeSection').style.display = 'block';
+errorMessage.style.display = 'none';
+} else {
+errorMessage.style.display = 'block';
+}
+}
+
+function logout() {
+document.getElementById('loginSection').style.display = 'flex';
+document.getElementById('homeSection').style.display = 'none';
+document.getElementById('emailInput').value = '';
+document.getElementById('passwordInput').value = '';
+}
+
+document.getElementById('passwordInput').addEventListener('keypress', function(event) {
+if (event.key === 'Enter') {
+login();
+}
+});
+
+function playVideo(videoSource) {
+const videoPlayer = document.getElementById('videoPlayer');
+const videoElement = document.getElementById('videoElement');
+videoElement.src = videoSource;
+videoPlayer.style.display = 'block';
+videoElement.play();
+}
+
+function closeVideo() {
+const videoPlayer = document.getElementById('videoPlayer');
+const videoElement = document.getElementById('videoElement');
+videoPlayer.style.display = 'none';
+videoElement.pause();
+videoElement.src = '';
+}
+</script>
+</body>
+</html>
